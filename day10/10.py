@@ -1,7 +1,6 @@
 f = open("10.txt", "r")
 nums = f.read().split("\n")
 
-print(nums)
 
 #Part 1
 def findJolts(nums):
@@ -16,6 +15,27 @@ def findJolts(nums):
 	return ones*(threes+1)
 
 print(findJolts(nums))
+
+#Part 2
+def findCombs(nums):
+    combinations = {}
+    nums = sorted([int(i) for i in nums])
+    end = max(nums)+3
+    nums = [0] + nums + [end]
+
+    combinations[nums[-1]] = 1
+
+    for value in nums[::-1]:
+        if value != end:
+	        sums = 0
+	        for i in range(1, 4):
+	            next_value = value + i
+	            if next_value in nums:
+	                sums += combinations[next_value]
+	        combinations[value] = sums
+    return combinations[0]
+
+print(findCombs(nums))
 
 
 
