@@ -2,31 +2,28 @@ f = open("3.txt", "r")
 grid = [i.strip() for i in f]
 
 #Part 1
-def findPath(grid, steps):
-	x, y = 0, 0
-	rightStep, upStep = steps
-	numLines = len(grid)
-	lineWidth = len(grid[0])
-
+def findTrees(grid, steps):
+	dx, dy = steps
+	rows, cols = len(grid), len(grid[0])
+	i, j = 0, 0
 	trees = 0
-	while y < numLines:
-		if grid[y][x] == "#":
-			trees+= 1
-		y += upStep 
-		x = (x+rightStep)%lineWidth
+	while i < rows:
+		val = grid[i][j%cols]
+		if val == "#":
+			trees += 1
+		i += dy
+		j += dx
 	return trees
 
-print(findPath(grid, (3, 1)))
-
-#Part 2
-def findPaths(grid, steps):
+def findTotalPaths(grid, steps):
 	total = 1
 	for step in steps:
-		total *= findPath(grid, step)
-	return total 
+		total *= findTrees(grid, step)
+	return total
 
 steps = [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]
-print(findPaths(grid, steps))
+print(findTrees(grid, (3, 1)))
+print(findTotalPaths(grid, steps))
 
 
 

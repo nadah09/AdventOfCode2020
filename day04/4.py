@@ -1,88 +1,83 @@
 f = open("4.txt", "r")
-passports = f.read().split("\n\n")
+passports = [i.strip() for i in f.read().split("\n\n")]
 
 #Part 1
 def checkValid(passports):
 	valid = 0
-	required = {"iyr", "byr", "eyr", "hgt", "hcl", "ecl", "pid"}
+	totalFields = {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"}
 	for passport in passports:
-		add = True
-		for r in required:
-			if r not in passport:
-				add = False 
-		if add:
-			valid += 1
-	return valid 
-
-print(checkValid(passports))
-
-#Part 2
-def checkValid2(passports):
-	valid = 0 
-	required = {"iyr", "byr", "eyr", "hgt", "hcl", "ecl", "pid"}
-	eyes = {"brn", "amb", "blu", "gry", "grn", "hzl", "oth"}
-	chars = "abcdef0123456789"
-	for passport in passports:
-		add = True 
-		for r in required:
-			if r not in passport:
-				add = False 
-			else:
-				field = passport.split(r+":")[1].split(" ")[0].strip().split("\n")[0]
-				if r == "byr":
-					try:
-						field = int(field)
-						if field < 1920 or field > 2002:
-							add = False
-					except:
-						add = False
-				if r == "iyr":
-					try:
-						field = int(field)
-						if field < 2010 or field > 2020:
-							add = False
-					except:
-						add = False
-				if r == "eyr":
-					try:
-						field  = int(field)
-						if field < 2020 or field > 2030:
-							add = False
-					except:
-						add = False
-				if r == "hgt":
-					try:
-						num = int(field[:-2])
-					except:
-						add = False
-						break
-					if field[-2:] == "cm":
-						if num < 150 or num > 193:
-							add = False
-					elif field[-2:] == "in":
-						if num < 59 or num > 76:
-							add = False
-					else:
-						add = False
-				if r == "hcl":
-					num, field = field[0], field[1:]
-					if num != "#" or len(field)!=6:
-						add = False 
-					for i in field:
-						if i not in chars:
-							add = False
-				if r == "ecl":
-					if field not in eyes:
-						add = False
-				if r == "pid":
-					if len(field)!=9:
-						add = False 
-					try:
-						field = int(field)
-					except:
-						add = False
-		if add:
+		passport = ' '.join(passport.split("\n"))
+		fields = passport.split(" ")
+		categories = [i.split(":")[0] for i in fields]
+		if len(categories) == 8 or len(categories) == 7 and "cid" not in categories:
 			valid += 1
 	return valid
 
+#Part 2
+def checkValid2(passports):
+	valid = 0
+	for passport in passports:
+		passport = ' '.join(passport.split("\n"))
+		fields = passport.split(" ")
+		categories = [i.split(":")[0] for i in fields]
+		if len(categories) == 8 or len(categories) == 7 and "cid" not in categories:
+			if checkPassport(fields):
+				valid += 1
+	return valid
+
+def checkPassport(fields):
+	eyes = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"}
+	for field in fields:
+		cat, value = field.split(":")
+		if cat == "byr":
+			try:
+				year = int(value)
+				if year < 1920 or year > 2002:
+					return False
+			except:
+				return False
+		if cat == "iyr":
+			try:
+				year = int(value)
+				if year < 2010 or year > 2020:
+					return False
+			except:
+				return False
+		if cat == "eyr":
+			try:
+				year = int(value)
+				if year < 2020 or year > 2030:
+					return False
+			except:
+				return False
+		if cat == "hgt":
+			num, label = value[:-2], value[-2:]
+			try:
+				num = int(num)
+			except:
+				return False
+			if label == "in":
+				if num < 59 or num > 76:
+					return False
+			elif label == "cm":
+				if num < 150 or num > 193:
+					return False
+			else:
+				return False
+		if cat == "hcl":
+			if value[0] != "#":
+				return False
+			if not value[1:].isalnum():
+				return False
+		if cat == "ecl":
+			if value not in eyes:
+				return False
+		if cat == "pid":
+			if not (len(value) == 9 and value.isnumeric()):
+				return False
+
+	return True
+
+
+print(checkValid(passports))
 print(checkValid2(passports))

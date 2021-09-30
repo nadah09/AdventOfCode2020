@@ -4,39 +4,55 @@ f = open("5.txt", "r")
 seats = f.read().split("\n")
 seats = [i.strip() for i in seats[:-1]]
 
-#Part1 
-def findRowCol(seat):
-	lowRow, highRow = 0, 127
-	lowCol, highCol= 0, 7
-	for i in range(7):
-		mid = (lowRow+highRow)/2
-		if seat[i] == "F":
-			highRow = floor(mid)
-		if seat[i] == "B":
-			lowRow = ceil(mid)
-	for i in range(7, 10):
-		mid = (lowCol+highCol)/2
-		if seat[i] == "L":
-			highCol = floor(mid)
-		if seat[i] == "R":
-			lowCol = ceil(mid)
-	return (lowRow, lowCol)
+#Part 1
+def findMax(seats):
+	maxSeat = 0
+	for seat in seats:
+		num = findSeatNum(seat)
+		maxSeat = max(maxSeat, num)
+	return maxSeat
 
-def findHighestSeat(seats):
-	rowCols = [findRowCol(seat) for seat in seats]
-	ids = [i[0]*8+i[1] for i in rowCols]
-	return max(ids)
+def findSeatNum(seat):
+	#seats = ["FBFBBFFRLR"]
+	r, c = seat[:7], seat[7:]
+	row = findRow(r)
+	col = findCol(c)
+	return row*8+col
 
-print(findHighestSeat(seats))
+def findRow(row):
+	l = 0
+	r = 127
+	for direction in row:
+		mid = (l+r)//2
+		if direction == "F":
+			r = mid
+		if direction == "B":
+			l = mid
+	return r
+
+def findCol(col):
+	l = 0
+	r = 7
+	for direction in col:
+		mid = (l+r)//2
+		if direction == "L":
+			r = mid
+		if direction == "R":
+			l = mid
+	return r
 
 #Part 2
 def findYourSeat(seats):
-	rowCols = [findRowCol(seat) for seat in seats]
-	ids = sorted([i[0]*8+i[1] for i in rowCols])[1:-1]
-	for i in range(len(ids)-1):
-		if ids[i+1] != ids[i]+1:
-			return ids[i]+1
+	seen = set()
+	for seat in seats:
+		num = findSeatNum(seat)
+		seen.add(num)
+	for seat in seen:
+		if seat + 1 not in seen and seat+2 in seen:
+			return seat+1
+	return 0
 
+print(findMax(seats))
 print(findYourSeat(seats))
 
 
