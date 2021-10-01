@@ -1,44 +1,36 @@
 f = open("9.txt", "r")
-nums = f.read().split("\n")
+nums = [int(i) for i in f.read().split("\n")]
 
-#Part 1 
-def hasSum(nums, num):
+def findFirstInvalid(nums):
+	for i in range(26, len(nums)):
+		window = nums[i-26:i]
+		curr = nums[i]
+		if not twoSum(window, curr):
+			return curr
+	return 0
+
+def twoSum(window, target):
 	seen = set()
-	for i in nums:
-		if num-i in seen:
+	for i in window:
+		if target-i in seen and i != target-i:
 			return True
 		seen.add(i)
 	return False
 
-def findInvalid(nums, skip = 25):
-	nums = [int(i) for i in nums]
-	for i in range(skip, len(nums)):
-		previous = nums[i-skip:i]
-		if not hasSum(previous, nums[i]):
-			return nums[i]
-	return 0
-
-print(findInvalid(nums, 5))
-
-#Part 2
 def findSum(nums):
-	nums = [int(i) for i in nums]
-	invalid = findInvalid(nums, 25)
+	target = findFirstInvalid(nums)
+	l = 0
+	r = 0
+	curr = 0
+	while curr != target:
+		if curr < target:
+			r += 1
+			curr += nums[r-1]
+		if curr > target:
+			l += 1
+			curr -= nums[l-1]
+	window = nums[l:r+1]
+	return min(window) + max(window)
 
-	s = 0
-	e = 0
-	cursum = nums[0]
-
-	while True:
-		if cursum < invalid:
-			e += 1
-			cursum += nums[e]
-		elif cursum > invalid:
-			cursum -= nums[s]
-			s += 1
-		else:
-			r = nums[s:e+1]
-			return min(r)+max(r)
-	return 0
-
+print(findFirstInvalid(nums))
 print(findSum(nums))
