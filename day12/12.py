@@ -80,7 +80,6 @@ def rotateWayPoint(command, th, wx, wy):
         wx, wy = wy, -wx
     return wx, wy
 
-
 print(findManhattanDistance(dirs))
 print(findWayPointManhattanDistance(dirs))
 
