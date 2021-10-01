@@ -1,47 +1,47 @@
 f = open("8.txt", "r")
 insts = f.read().split("\n")
 
-#Part 1 
+#Part 1
 def findInfiniteLoop(insts):
+	acc = 0
 	seen = set()
 	i = 0
-	acc = 0
 	while i not in seen:
-		if i >= len(insts):
-			return acc, 1
-		inst, num = insts[i].split(" ")
-		num = int(num)
+		if i == len(insts):
+			return True, acc
 		seen.add(i)
-		if inst == "nop":
+		command, val = insts[i].split(" ")
+		if command == "nop":
 			i += 1
-		if inst == "acc":
-			acc += num 
+		elif command == "acc":
+			acc += int(val)
 			i += 1
-		if inst == "jmp":
-			i += num
-	return acc, 0
-
-print(findInfiniteLoop(insts)[0])
+		elif command == "jmp":
+			i += int(val)
+	return False, acc
 
 #Part 2
-def fix(insts):
+def correctInfiniteLoop(insts):
 	for i in range(len(insts)):
-		inst, num = insts[i].split(" ")
-		if inst == "jmp":
-			copy = [j for j in insts]
-			copy[i] = "nop" + " " + num
-			acc, finished = findInfiniteLoop(copy)
-			if finished == 1:
+		inst = insts[i]
+		command, val = inst.split(" ")
+		if command == "nop":
+			insts[i] = "jmp " + val
+			fixed, acc = findInfiniteLoop(insts)
+			if fixed:
 				return acc
-		elif inst == "nop":
-			copy = [j for j in insts]
-			copy[i] = "jmp" + " " + num
-			acc, finished = findInfiniteLoop(copy)
-			if finished == 1:
+			insts[i] = "nop " + val
+		elif command == "jmp":
+			insts[i] = "nop " + val
+			fixed, acc = findInfiniteLoop(insts)
+			if fixed:
 				return acc
+			insts[i] = "jmp " + val
 	return 0
 
-print(fix(insts))
+print(findInfiniteLoop(insts)[1])
+print(correctInfiniteLoop(insts))
+
 
 
 

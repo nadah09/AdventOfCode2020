@@ -2,55 +2,60 @@ f = open("7.txt", "r")
 bags = f.read().split("\n")
 
 #Part 1
-def make_parent_dict(bags):
-	parents = {}
-	childrenDict = {}
+def makeGraph(bags):
+	childToParent = {}
+	parentToChild = {}
 	for bag in bags:
-		parse = bag.split(" contain ")
-		parent = parse[0].split(" bags")[0]
-		children = parse[1:]
-		children = children[0].strip().split(", ")
+		parent, children = bag.split(" contain ")
+		parent = ' '.join(parent.split(" ")[:2])
+		children = [i.split(" bag")[0].strip() for i in children.split(", ")]
 		for child in children:
-			child = child.split(" ")
-			number = child[0]
-			color = child[1]+" "+child[2]
-			if color == "other bags.":
-				parents[parent] = []
-			elif color != None:
+			num, color = child.split(" ")[0], " ".join(child.split(" ")[1:])
+			try:
+				childToParent[color].append(parent)
+			except:
+				childToParent[color] = [parent]
+			try:
+				num = int(num)
 				try:
-					parents[parent].append((number, color))
+					parentToChild[parent].append((color, num))
 				except:
-					parents[parent] = [(number, color)]
-				try:
-					childrenDict[color].append(parent)
-				except:
-					childrenDict[color] = [parent]
-	return parents, childrenDict
+					parentToChild[parent] = [(color, num)]
+			except:
+				continue
+	return childToParent, parentToChild
 
-def BFS(bags):
-	_, children = make_parent_dict(bags)
-	start = "shiny gold"
-	final = []
+def BFS(graph, start):
 	queue = [start]
 	seen = set()
 	while queue:
 		curr = queue.pop(0)
-		if curr != start:
-			final.append(curr)
-		if curr in children:
-			for child in children[curr]:
-				queue.append(child)
+		seen.add(curr)
+		if curr in graph:
+			for parent in graph[curr]:
+				queue.append(parent)
+	return len(seen)-1
 
-	return len(set(final))
+def findPossibleBags(bags, start):
+	graph, parentToChild = makeGraph(bags)
+	return BFS(graph, start)
 
-print(BFS(bags))
 
 #Part 2
-def DFS(bags, bag_type, parents = []):
-	if not parents:
-		parents, _ = make_parent_dict(bags)
-	return sum(int(num) * DFS(bags, typ, parents) for num, typ in parents[bag_type]) + 1
+def DFS(parentToChild, start):
+	if start in parentToChild:
+		sum_ = 1
+		for color, num in parentToChild[start]:
+			sum_ += int(num)*DFS(parentToChild, color)
+		return sum_
+	else:
+		return 1
 
+def findTotalBags(bags, start):
+	graph, parentToChild = makeGraph(bags)
+	return DFS(parentToChild, start)-1
+	
 
-print(DFS(bags, "shiny gold")-1)
+print(findPossibleBags(bags, "shiny gold"))
+print(findTotalBags(bags, "shiny gold"))
 
