@@ -29,11 +29,24 @@ def findAllConfigurations(adaptors, start = 0, memo = None):
 			except:
 				pass
 		return sum_
-		
+	
+def findAllConfigurationsBottomUp(adaptors):
+	memo = {}
+	memo[0] = 1
+	for i in range(1, len(adaptors)):
+		poss = [i-1, i-2, i-3]
+		memo[i] = 0
+		for p in poss:
+			if p >= 0:
+				if adaptors[i] - adaptors[p] <= 3:
+					memo[i] += memo[p]
+	return memo[len(adaptors)-1]
+
 
 adaptors = [0] + sorted(adaptors) + [max(adaptors)+3]
 print(findJoltDifferences(adaptors))
 print(findAllConfigurations(adaptors))
+print(findAllConfigurationsBottomUp(adaptors))
 
 
 
