@@ -1,41 +1,39 @@
 f = open("10.txt", "r")
-nums = f.read().split("\n")
-
+adaptors = [int(i) for i in f.read().split("\n")]
 
 #Part 1
-def findJolts(nums):
-	nums = [0]+sorted([int(i) for i in nums])
-	ones = 0
-	threes = 0
-	for i in range(len(nums)-1):
-		if nums[i] + 1 == nums[i+1]:
-			ones+=1
-		if nums[i]+3 == nums[i+1]:
-			threes += 1
-	return ones*(threes+1)
-
-print(findJolts(nums))
+def findJoltDifferences(adaptors):
+	counts = {1: 0, 2: 0, 3: 0}
+	for i in range(len(adaptors)-1):
+		diff = adaptors[i+1] - adaptors[i]
+		counts[diff] += 1
+	return counts[1]*counts[3]
 
 #Part 2
-def findCombs(nums):
-    combinations = {}
-    nums = sorted([int(i) for i in nums])
-    end = max(nums)+3
-    nums = [0] + nums + [end]
+def findAllConfigurations(adaptors, start = 0, memo = None):
+	if not memo:
+		memo = {}
+	if start >= len(adaptors)-1:
+		return 1
+	else:
+		poss = [start+1, start+2, start+3]
+		currAdaptor = adaptors[start]
+		sum_ = 0
+		for p in poss:
+			try:
+				nextAdaptor = adaptors[p]
+				if nextAdaptor - currAdaptor <= 3:
+					if p not in memo:
+						memo[p] = findAllConfigurations(adaptors, p, memo)
+					sum_ += memo[p]
+			except:
+				pass
+		return sum_
+		
 
-    combinations[nums[-1]] = 1
-
-    for value in nums[::-1]:
-        if value != end:
-	        sums = 0
-	        for i in range(1, 4):
-	            next_value = value + i
-	            if next_value in nums:
-	                sums += combinations[next_value]
-	        combinations[value] = sums
-    return combinations[0]
-
-print(findCombs(nums))
+adaptors = [0] + sorted(adaptors) + [max(adaptors)+3]
+print(findJoltDifferences(adaptors))
+print(findAllConfigurations(adaptors))
 
 
 

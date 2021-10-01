@@ -1,6 +1,7 @@
 f = open("9.txt", "r")
 nums = [int(i) for i in f.read().split("\n")]
 
+#Part 1
 def findFirstInvalid(nums):
 	for i in range(26, len(nums)):
 		window = nums[i-26:i]
@@ -17,6 +18,7 @@ def twoSum(window, target):
 		seen.add(i)
 	return False
 
+#Part 2
 def findSum(nums):
 	target = findFirstInvalid(nums)
 	l = 0
