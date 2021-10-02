@@ -1,8 +1,6 @@
 f = open("15.txt", "r")
 lines = f.read().split("\n")
-print(lines)
 nums = [int(i) for i in lines[0].split(",")]
-print(nums)
 
 #Part 1
 def find2020Num(nums, target):
@@ -25,7 +23,6 @@ def find2020Num(nums, target):
 
 #Part 2
 #Same as Part 1
-
 
 print(find2020Num(nums, 2020))
 print(find2020Num(nums, 30000000))
